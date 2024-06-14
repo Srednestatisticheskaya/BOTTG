@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.tgbot.tgbot.model.JokeCall;
+import ru.tgbot.tgbot.repository.JokeRepository;
 import ru.tgbot.tgbot.service.JokeService;
 import ru.tgbot.tgbot.model.Joke;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class JokeController {
     private final JokeService jokeService;
+    private final JokeRepository jokeRepository;
 
     @GetMapping
     public ResponseEntity<List<Joke>> getAllJokes() {
@@ -69,7 +71,7 @@ public class JokeController {
     }
     @GetMapping("/top")
     public ResponseEntity<List<Joke>> getTopJokes() {
-        List<Joke> topJokes = jokeService.getTopJokes();
+        List<Joke> topJokes = jokeRepository.findTop5ByOrderByIdDesc();
         return ResponseEntity.ok(topJokes);
     }
 

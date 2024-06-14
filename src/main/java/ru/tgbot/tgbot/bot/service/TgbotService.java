@@ -111,13 +111,12 @@ public class TgbotService extends TelegramLongPollingBot {
     }
 
     public void sendTop5Jokes(long chatId) {
-        List<Joke> top5Jokes = jokeService.getTopJokes(); // Получаем топ-5 анекдотов из сервиса
-
+        List<Joke> top5Jokes = jokeRepository.findTop5ByOrderByIdDesc(); // Получаем топ-5 анекдотов из сервиса
         if (top5Jokes.isEmpty()) {
             sendMessage(chatId, "No jokes available.");
         } else {
             StringBuilder top5JokesText = new StringBuilder("Top 5 jokes:\n");
-            for (int i = 0; i < Math.min(5, top5Jokes.size()); i++) {
+            for (int i = 0; i < top5Jokes.size(); i++) {
                 top5JokesText.append(i + 1).append(". ").append(top5Jokes.get(i).getJoke()).append("\n");
             }
             sendMessage(chatId, top5JokesText.toString());
