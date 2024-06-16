@@ -65,7 +65,7 @@ public class JokeController {
     }
     @GetMapping("/top")
     public ResponseEntity<List<Joke>> getTopJokes() {
-        List<Joke> topJokes = jokeRepository.findTop5ByOrderByIdDesc();
+        List<Joke> topJokes = jokeRepository.findTop5ByOrderByCallsDesc();
         return ResponseEntity.ok(topJokes);
     }
 
