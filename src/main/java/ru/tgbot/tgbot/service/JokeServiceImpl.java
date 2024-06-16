@@ -1,6 +1,7 @@
 package ru.tgbot.tgbot.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import ru.tgbot.tgbot.model.JokeCall;
@@ -22,16 +23,17 @@ public class JokeServiceImpl implements JokeService {
 
 
     @Override
-    public Optional<Joke> addNewJoke(@RequestBody Joke newJoke) {
+    public Optional<Joke> addNewJoke(Joke newJoke) {
         try {
+            newJoke.setJoke(newJoke.getJoke());
             newJoke.setTimeCreated(LocalDate.now());
             newJoke.setTimeUpdated(LocalDate.now());
             if (newJoke.getJokeHistory() == null) {
                 newJoke.setJokeHistory(new ArrayList<>());
             }
-            newJoke.getJokeHistory().add(new JokeHistory(null, newJoke, new Date()));
+            newJoke.getJokeHistory().add(new JokeHistory(null, newJoke,new Date()));
 
-            Joke savedJoke = jokeRepository.saveAndFlush(newJoke);
+            Joke savedJoke = jokeRepository.save(newJoke);
 
             return Optional.of(savedJoke);
         } catch (Exception e) {
@@ -49,10 +51,7 @@ public class JokeServiceImpl implements JokeService {
 
     @Override
     public Optional<Joke> getJokesById(Long id) {
-        List<Joke> allJokes = getAllJokes();
-        return allJokes.stream()
-                .filter(joke -> joke.getId().equals(id))
-                .findFirst();
+        return jokeRepository.findById(id);
     }
 
     @Override
@@ -80,13 +79,12 @@ public class JokeServiceImpl implements JokeService {
     }
 
     @Override
-    public Joke deleteJoke(Joke deletedJoke) {
-        Optional<Joke> existingJoke = jokeRepository.findById(deletedJoke.getId());
-        if (existingJoke.isPresent()) {
-            jokeRepository.deleteById(deletedJoke.getId());
-            return existingJoke.get();
+    public ResponseEntity<String> deleteJoke(Long id) {
+        if (jokeRepository.findById(id).isPresent()) {
+            jokeRepository.deleteById(id);
+            return ResponseEntity.ok("Ваша шутка про пупу и лупу успешно удалена :) ");
         } else {
-            throw new NoSuchElementException("Шутка с " + deletedJoke.getId() + " ID не найдена");
+            throw new NoSuchElementException("Шутка с " +id + " ID не найдена");
         }
     }
 
@@ -106,25 +104,6 @@ public class JokeServiceImpl implements JokeService {
 
         return jokeCalls;
     }
-
-    @Override
-    public List<Joke> getTopJokes() {
-        // Получаем все анекдоты из репозитория
-
-
-            // Получаем все анекдоты из репозитория
-            List<Joke> allJokes = jokeRepository.findAll();
-
-            // Сортируем анекдоты по количеству вызовов в убывающем порядке
-            allJokes.sort(Comparator.comparingInt(Joke::getCalls).reversed());
-
-            // Выбираем первые пять анекдотов (если их количество больше 5)
-            return allJokes.subList(0, Math.min(5, allJokes.size()));
-        }
-
-
-
-
 
 }
 

@@ -22,9 +22,17 @@ public class SpringSecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(expressionInterceptUrlRegistry ->
                         expressionInterceptUrlRegistry
+                                .requestMatchers(HttpMethod.GET, "/jokes").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/jokes/{id}").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/jokes/top").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/jokes/calls/{id}").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/jokes").permitAll()
+                                // Разрешить только модераторам и администраторам доступ к POST, PUT, DELETE запросам на /jokes
+                                .requestMatchers(HttpMethod.POST, "/jokes").hasAnyAuthority(UserAuthority.MODERATOR.getAuthority(), UserAuthority.ADMIN.getAuthority())
+                                .requestMatchers(HttpMethod.PUT, "/jokes/{id}").hasAnyAuthority(UserAuthority.MODERATOR.getAuthority(), UserAuthority.ADMIN.getAuthority())
+                                .requestMatchers(HttpMethod.DELETE, "/jokes/{id}").hasAnyAuthority(UserAuthority.MODERATOR.getAuthority(), UserAuthority.ADMIN.getAuthority())
                                 .requestMatchers("/registration", "/login").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/jokes").hasAuthority(UserAuthority.USER.getAuthority())
-                                .requestMatchers(HttpMethod.GET, "/jokes/**").hasAuthority(UserAuthority.MODERATOR.getAuthority())
+                                // Все остальные запросы доступны только администратору
                                 .anyRequest().hasAuthority(UserAuthority.ADMIN.getAuthority()))
                 .formLogin(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable);

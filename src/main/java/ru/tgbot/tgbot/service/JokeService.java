@@ -1,5 +1,6 @@
 package ru.tgbot.tgbot.service;
 
+import org.springframework.http.ResponseEntity;
 import ru.tgbot.tgbot.model.Joke;
 import ru.tgbot.tgbot.model.JokeCall;
 
@@ -11,11 +12,11 @@ public interface JokeService {
     Joke updateJoke(Long id, Joke joke);
 
     Optional<Joke> addNewJoke(Joke json);
-    Joke deleteJoke(Joke jokeToDelete );
+    ResponseEntity<String> deleteJoke(Long id);
 
     Optional<Joke> getJokesById(Long id);
     // В интерфейсе JokeService
-    List<Joke> getTopJokes();
+
     List<JokeCall> getJokeCallsByJokeId(Long id, Long userId);
 
 

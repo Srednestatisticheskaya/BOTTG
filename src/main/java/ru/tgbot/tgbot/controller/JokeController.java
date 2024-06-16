@@ -31,9 +31,9 @@ public class JokeController {
     }
 
     @PostMapping
-    public ResponseEntity addNewJoke(@RequestBody Joke newJoke) {
-        Optional<Joke> savedJoke = jokeService.addNewJoke(newJoke);
-        return savedJoke.map(ResponseEntity::ok)
+    public ResponseEntity addNewJoke(@RequestBody Joke text) {
+
+        return jokeService.addNewJoke(text).map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.badRequest().build());
     }
 
@@ -45,29 +45,23 @@ public class JokeController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Joke> deleteJoke(@PathVariable Long id) {
-        Optional<Joke> deleteToJoke = jokeService.getJokesById(id);
-        if (deleteToJoke.isPresent()) {
-            Joke jokeToDelete = deleteToJoke.get();
-            Joke deleteJoke = jokeService.deleteJoke(jokeToDelete);
-            return ResponseEntity.ok(deleteJoke);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-    @GetMapping("/{id}/calls")
-    public ResponseEntity<List<JokeCall>> getJokeCallsByJokeId(@PathVariable("id") Long id) {
-        Optional<Joke> joke = jokeService.getJokesById(id);
-        if (joke.isPresent()) {
-            // Генерируем userId (ваша логика генерации userId)
-            Long userId = 1L; // Пример генерации userId
+    public ResponseEntity<String> deleteJoke(@PathVariable Long id) {
+            return jokeService.deleteJoke(id);
+            }
 
-            List<JokeCall> jokeCalls = jokeService.getJokeCallsByJokeId(id, userId);
+    @GetMapping("/calls/{id}")
+        public ResponseEntity<List<JokeCall>> getJokeCallsByJokeId(@PathVariable("id") Long id) {
+            Optional<Joke> joke = jokeService.getJokesById(id);
+            if (joke.isPresent()) {
+                // Генерируем userId (ваша логика генерации userId)
+                Long userId = 1L; // Пример генерации userId
 
-            return ResponseEntity.ok(jokeCalls);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+                List<JokeCall> jokeCalls = jokeService.getJokeCallsByJokeId(id, userId);
+
+                return ResponseEntity.ok(jokeCalls);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
     }
     @GetMapping("/top")
     public ResponseEntity<List<Joke>> getTopJokes() {
